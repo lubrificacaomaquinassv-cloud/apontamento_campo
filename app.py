@@ -67,6 +67,18 @@ OPERACOES = [
     "Irrigacao",
     "Manutencao de Estrada",
     "Carregamento",
+    "Limpeza de Rank",
+    "Marcacao de Pastoril",
+    "Conceicao",
+    "Capina Quimica",
+    "Lamininha",
+    "Coleta de Residuos",
+    "Carreta do Sal",
+    "Limpeza de Rua Sulcacao",
+    "Pipinha do Plantio",
+    "Encabecamento de Curva",
+    "Remocao de Cerca",
+    "Enterrando animais",
     "Outra",
 ]
 
