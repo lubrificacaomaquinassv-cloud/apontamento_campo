@@ -92,6 +92,7 @@ OPERACOES = [
     "LIMPEZA DE BAIA",
     "ESPLANADA",
     "SERVICOS DIVERSOS",
+    "LIMPEZA DE COCHO",
     "OUTRA",
 ]
 
