@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import date
 from io import BytesIO
 from supabase import create_client
+from sigcf_auth import exigir_acesso
 
 st.set_page_config(
     page_title="Apontamento de Campo - SIGCF",
@@ -12,6 +13,8 @@ st.set_page_config(
 )
 
 LOGO_URL = "https://i.postimg.cc/Y9X7ddnb/LOGO-BP.jpg"
+
+exigir_acesso("Apontamento de Campo")
 
 st.markdown("""
 <style>
@@ -62,6 +65,13 @@ div[data-testid="stMetricValue"]{color:#6fcf60!important;font-family:'Barlow Con
 [data-testid="stExpander"]{
  background:#0d180c!important;border:1px solid #1e2e1c!important;border-radius:10px;}
 [data-testid="stExpander"] summary{color:#e8edd0!important;}
+.stTabs [data-baseweb="tab-highlight"]{background-color:#4a9e3f!important;}
+.stButton button,[data-testid="stFormSubmitButton"] button{
+ background:#4a9e3f!important;color:#ffffff!important;border:1px solid #6fcf60!important;
+ font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1.5px;
+ text-transform:uppercase;border-radius:8px;}
+.stButton button:hover,[data-testid="stFormSubmitButton"] button:hover{background:#3d8534!important;}
+.stButton button p,[data-testid="stFormSubmitButton"] button p{color:#ffffff!important;}
 </style>
 """, unsafe_allow_html=True)
 
