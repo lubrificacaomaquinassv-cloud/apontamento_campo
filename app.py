@@ -5,7 +5,7 @@ from io import BytesIO
 from supabase import create_client
 
 st.set_page_config(
-    page_title="Apontamento de Campo - SIGCF",
+    page_title="APONTAMENTO DE CAMPO - SIGCF",
     page_icon="🚜",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -198,7 +198,7 @@ with col_logo:
     st.markdown(logo_html(118), unsafe_allow_html=True)
 with col_titulo:
     st.title("Apontamento de Campo")
-    st.caption("SIGCF — Sistema Integrado de Gestão de Custos de Frota")
+    st.caption("SIGCF — SISTEMA INTEGRADO DE GESTÃO DE CUSTOS DE FROTA")
 
 pagina = st.tabs(["📝 Novo Apontamento", "📋 Consultar", "📊 Resumo por Frota"])
 
