@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import date
 from io import BytesIO
 from supabase import create_client
-from sigcf_auth import exigir_acesso
+from sigcf_auth import exigir_acesso, logo_html, LOGO_FRAME_CSS
 
 st.set_page_config(
     page_title="Apontamento de Campo - SIGCF",
@@ -11,8 +11,6 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
-LOGO_URL = "https://i.postimg.cc/Y9X7ddnb/LOGO-BP.jpg"
 
 exigir_acesso("Apontamento de Campo")
 
@@ -28,8 +26,7 @@ h1{font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
 .sec{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
  letter-spacing:2px;text-transform:uppercase;color:#8aab80;
  border-left:4px solid #4a9e3f;padding-left:10px;margin:8px 0 12px;}
-.logo-box{background:#ffffff;border-radius:10px;padding:8px 12px;display:inline-block;}
-
+""" + LOGO_FRAME_CSS + """
 .stTextInput input,.stNumberInput input,.stTextArea textarea,
 [data-testid="stDateInput"] input{
  background:#dce6d2!important;color:#1a2818!important;
@@ -192,9 +189,9 @@ colaboradores = carregar_colaboradores()
 # ─────────────────────────────────────────────
 # HEADER
 # ─────────────────────────────────────────────
-col_logo, col_titulo = st.columns([1, 5])
+col_logo, col_titulo = st.columns([1.1, 5.9])
 with col_logo:
-    st.markdown(f'<div class="logo-box"><img src="{LOGO_URL}" width="100"></div>', unsafe_allow_html=True)
+    st.markdown(logo_html(118), unsafe_allow_html=True)
 with col_titulo:
     st.title("Apontamento de Campo")
     st.caption("SIGCF — Sistema Integrado de Gestão de Custos de Frota")
