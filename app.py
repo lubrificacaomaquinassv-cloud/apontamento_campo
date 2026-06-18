@@ -172,7 +172,7 @@ def rodape_ultimos_lancamentos():
     st.divider()
     st.markdown('<div class="sec">Últimos lançamentos</div>', unsafe_allow_html=True)
     dark_table(ultimos_lancamentos_df(), height=200)
-    st.caption("SIGCF | Apontamento de Campo | Núcleo de Controladoria SV")
+    st.caption("SIGCF | APONTAMENTO DE CAMPO | NÚCLEO DE CONTROLADORIA")
 
 
 OPERACOES = [
@@ -197,7 +197,7 @@ col_logo, col_titulo = st.columns([1.1, 5.9])
 with col_logo:
     st.markdown(logo_html(118), unsafe_allow_html=True)
 with col_titulo:
-    st.title("Apontamento de Campo")
+    st.title("APONTAMENTO DE CAMPO")
     st.caption("SIGCF — SISTEMA INTEGRADO DE GESTÃO DE CUSTOS DE FROTA")
 
 pagina = st.tabs(["📝 Novo Apontamento", "📋 Consultar", "📊 Resumo por Frota"])
