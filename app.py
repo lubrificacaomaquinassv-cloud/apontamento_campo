@@ -13,7 +13,7 @@ st.set_page_config(
 
 from sigcf_auth import exigir_acesso, logo_html
 
-exigir_acesso("Apontamento de Campo")
+exigir_acesso("APONTAMENTO DE CAMPO")
 
 st.markdown("""
 <style>
