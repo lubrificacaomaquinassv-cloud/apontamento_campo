@@ -1,8 +1,6 @@
-"""PIN opcional SIGCF / SIGRH — logo Santa Virgínia premium."""
+"""PIN opcional SIGCF / SIGRH - logo Santa Virginia premium."""
 import base64
 from pathlib import Path
-
-import streamlit as st
 
 LOGO_URL = "https://i.postimg.cc/Y9X7ddnb/LOGO-BP.jpg"
 LOGO_FILE = Path(__file__).resolve().parent / "assets" / "logo_santa_verginia.png"
@@ -10,16 +8,16 @@ BG_URL = "https://media.bio.site/sites/32a25c2c-d6fa-4dfc-bdc2-27e4d35d7ea2/AhS9
 INSTAGRAM_URL = "https://www.instagram.com/fazendasantaverginia"
 SESSION_KEY = "sigcf_auth"
 
+LOGO_FRAME_CSS = (
+    ".logo-frame{background:linear-gradient(145deg,#0a1628,#0d2040);border:2px solid #c9a227;"
+    "border-radius:12px;padding:5px;display:inline-block;box-shadow:0 4px 18px rgba(0,0,0,.45);}"
+    ".logo-frame img{display:block;border-radius:8px;}"
+)
+
 INSTA_ICON = (
     '<img class="insta-ico" src="https://cdn.simpleicons.org/instagram/8ec486" '
     'width="17" height="17" alt="" loading="lazy">'
 )
-
-LOGO_FRAME_CSS = """
-.logo-frame{background:linear-gradient(145deg,#0a1628,#0d2040);border:2px solid #c9a227;
- border-radius:12px;padding:5px;display:inline-block;box-shadow:0 4px 18px rgba(0,0,0,.45);}
-.logo-frame img{display:block;border-radius:8px;}
-"""
 
 
 def logo_html(width: int = 118) -> str:
@@ -28,7 +26,7 @@ def logo_html(width: int = 118) -> str:
         src = f"data:image/png;base64,{b64}"
     else:
         src = LOGO_URL
-    return f'<div class="logo-frame"><img src="{src}" width="{width}" alt="Santa Virgínia"></div>'
+    return f'<div class="logo-frame"><img src="{src}" width="{width}" alt="Santa Virginia"></div>'
 
 
 def link_instagram(text: str = "@fazendasantaverginia") -> str:
@@ -38,7 +36,9 @@ def link_instagram(text: str = "@fazendasantaverginia") -> str:
     )
 
 
-def exigir_acesso(titulo: str, subtitulo: str = "Acesso restrito — SIGCF Santa Virgínia"):
+def exigir_acesso(titulo: str, subtitulo: str = "Acesso restrito - SIGCF Santa Virginia"):
+    import streamlit as st
+
     pin_cfg = str(st.secrets.get("APP_PIN", "") or "").strip()
     if not pin_cfg:
         return
@@ -62,7 +62,7 @@ def exigir_acesso(titulo: str, subtitulo: str = "Acesso restrito — SIGCF Santa
         </style>
         """
         .replace("__BG__", BG_URL)
-        .replace("__LOGO_CSS__", LOGO_FRAME_CSS.strip()),
+        .replace("__LOGO_CSS__", LOGO_FRAME_CSS),
         unsafe_allow_html=True,
     )
     col_logo, col_titulo = st.columns([1, 4])

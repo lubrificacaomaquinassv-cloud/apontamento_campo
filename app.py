@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import date
 from io import BytesIO
 from supabase import create_client
-from sigcf_auth import exigir_acesso, logo_html, LOGO_FRAME_CSS
 
 st.set_page_config(
     page_title="Apontamento de Campo - SIGCF",
@@ -11,6 +10,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+from sigcf_auth import exigir_acesso, logo_html
 
 exigir_acesso("Apontamento de Campo")
 
@@ -26,7 +27,10 @@ h1{font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
 .sec{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
  letter-spacing:2px;text-transform:uppercase;color:#8aab80;
  border-left:4px solid #4a9e3f;padding-left:10px;margin:8px 0 12px;}
-""" + LOGO_FRAME_CSS + """
+.logo-frame{background:linear-gradient(145deg,#0a1628,#0d2040);border:2px solid #c9a227;
+ border-radius:12px;padding:5px;display:inline-block;box-shadow:0 4px 18px rgba(0,0,0,.45);}
+.logo-frame img{display:block;border-radius:8px;}
+
 .stTextInput input,.stNumberInput input,.stTextArea textarea,
 [data-testid="stDateInput"] input{
  background:#dce6d2!important;color:#1a2818!important;
