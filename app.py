@@ -1,11 +1,12 @@
+import re
 import streamlit as st
 import pandas as pd
-from datetime import date
+from datetime import date, time
 from io import BytesIO
 from supabase import create_client
 
 st.set_page_config(
-    page_title="APONTAMENTO DE CAMPO - SIGCF",
+    page_title="Apontamento de Campo - SIGCF",
     page_icon="🚜",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -13,7 +14,7 @@ st.set_page_config(
 
 from sigcf_auth import exigir_acesso, logo_html
 
-exigir_acesso("APONTAMENTO DE CAMPO")
+exigir_acesso("Apontamento de Campo")
 
 st.markdown("""
 <style>
@@ -108,6 +109,122 @@ def gerar_excel(df: pd.DataFrame) -> bytes:
     return buf.getvalue()
 
 
+def fmt_hora(t):
+    """time ou string HH:MM → 'HH:MM' ou None."""
+    if t is None:
+        return None
+    if isinstance(t, time):
+        return t.strftime("%H:%M")
+    s = str(t).strip()
+    if not s:
+        return None
+    m = re.match(r"^(\d{1,2}):(\d{2})$", s)
+    if not m:
+        return None
+    h, mi = int(m.group(1)), int(m.group(2))
+    if 0 <= h <= 23 and 0 <= mi <= 59:
+        return f"{h:02d}:{mi:02d}"
+    return None
+
+
+def parse_hora_txt(txt):
+    """Aceita HH:MM ou vazio."""
+    return fmt_hora(txt)
+
+
+def montar_insumo(insumo, qtd, unidade, extras):
+    """Monta texto de insumo (principal + adicionais). None se vazio."""
+    partes = []
+    ins = str(insumo or "").strip()
+    if ins:
+        if qtd is not None and qtd > 0 and unidade and unidade != "—":
+            partes.append(f"{ins} {qtd:g} {unidade}")
+        else:
+            partes.append(ins)
+    ext = str(extras or "").strip()
+    if ext:
+        partes.append(ext)
+    return " | ".join(partes) if partes else None
+
+
+def parse_qtd_insumo(txt):
+    """Quantidade opcional — vazio permanece None."""
+    s = str(txt or "").strip().replace(",", ".")
+    if not s:
+        return None
+    try:
+        v = float(s)
+        return v if v > 0 else None
+    except ValueError:
+        return None
+
+
+def campos_insumo(insumo, qtd_txt, unidade, extras):
+    """
+    Retorna insumo / quantidade_insumo / unidade para o INSERT.
+    Sem informe de defensivo ou insumo → todos None (NULL no banco).
+    """
+    ins = str(insumo or "").strip()
+    ext = str(extras or "").strip()
+    qtd = parse_qtd_insumo(qtd_txt)
+
+    if not ins and not ext:
+        return {"insumo": None, "quantidade_insumo": None, "unidade": None}
+
+    texto = montar_insumo(insumo, qtd, unidade, extras)
+    qtd_db = None
+    un_db = None
+    if ins and qtd is not None and unidade and unidade != "—":
+        qtd_db = qtd
+        un_db = unidade
+
+    return {"insumo": texto, "quantidade_insumo": qtd_db, "unidade": un_db}
+
+
+def nulo_se_vazio(val):
+    """Texto vazio → None (NULL). Horários já vêm None quando em branco."""
+    if val is None:
+        return None
+    s = str(val).strip()
+    return s if s else None
+
+
+def montar_observacao(obs, almoco, retorno):
+    """Observação livre + almoço/retorno opcionais."""
+    linhas = []
+    if almoco:
+        linhas.append(f"Almoço {almoco}")
+    if retorno:
+        linhas.append(f"Retorno {retorno}")
+    base = str(obs or "").strip()
+    if base:
+        linhas.append(base)
+    return "\n".join(linhas) if linhas else None
+
+
+COLUNAS_CONSULTA = [
+    "data", "operador", "frota", "succao", "talhoes", "local",
+    "inicio_turno", "fim_turno", "inicio_operacao", "fim_operacao",
+    "h_inicial", "h_final", "horas_trabalhadas",
+    "insumo", "quantidade_insumo", "unidade", "observacao",
+]
+LABELS_CONSULTA = {
+    "data": "Data", "operador": "Operador", "frota": "Frota",
+    "succao": "Operação", "talhoes": "Talhão(ões)", "local": "Local",
+    "inicio_turno": "Início turno", "fim_turno": "Fim turno",
+    "inicio_operacao": "Início oper.", "fim_operacao": "Fim oper.",
+    "h_inicial": "H.Ini", "h_final": "H.Fin", "horas_trabalhadas": "Horas",
+    "insumo": "Insumo", "quantidade_insumo": "Qtd", "unidade": "Un.",
+    "observacao": "Obs",
+}
+
+UNIDADES_INSUMO = ["—", "ml", "L", "lts", "kg", "g", "GM", "UN"]
+
+OPERACOES_SEM_INSUMO_HINT = (
+    "Gradagem, rocagem, transporte, limpeza e similares — **sem** adubo, defensivo ou calda."
+)
+
+
 # ─────────────────────────────────────────────
 # CONEXÃO
 # ─────────────────────────────────────────────
@@ -157,8 +274,10 @@ def ultimos_lancamentos_df(limit=12):
         "frota": "Frota",
         "operador": "Operador",
         "succao": "Operação",
+        "talhoes": "Talhão",
         "horas_trabalhadas": "Horas",
-        "local": "Local",
+        "inicio_operacao": "Início op.",
+        "fim_operacao": "Fim op.",
     }
     df = pd.DataFrame(rows)
     cols = [c for c in rename if c in df.columns]
@@ -172,7 +291,7 @@ def rodape_ultimos_lancamentos():
     st.divider()
     st.markdown('<div class="sec">Últimos lançamentos</div>', unsafe_allow_html=True)
     dark_table(ultimos_lancamentos_df(), height=200)
-    st.caption("SIGCF | APONTAMENTO DE CAMPO | NÚCLEO DE CONTROLADORIA")
+    st.caption("SIGCF | Apontamento de Campo | Núcleo de Controladoria SV")
 
 
 OPERACOES = [
@@ -185,7 +304,7 @@ OPERACOES = [
     "TRATO", "CARREGAR CALCARIO", "TERRAPLANAGEM RURAL", "COMBATE INCENDIO",
     "CONTROLE DE FORMIGA", "ACEIRO DE FLORESTA", "CARREADOR DE FLORESTA",
     "HERCULES", "PUXAR LINK", "FENO", "LIMPEZA DE BAIA", "ESPLANADA",
-    "SERVICOS DIVERSOS", "LIMPEZA DE COCHO", "OUTRA", "COLUMBINHA", "REPLANTIO",
+    "SERVICOS DIVERSOS", "LIMPEZA DE COCHO", "OUTRA",
 ]
 
 colaboradores = carregar_colaboradores()
@@ -197,8 +316,8 @@ col_logo, col_titulo = st.columns([1.1, 5.9])
 with col_logo:
     st.markdown(logo_html(118), unsafe_allow_html=True)
 with col_titulo:
-    st.title("APONTAMENTO DE CAMPO")
-    st.caption("SIGCF — SISTEMA INTEGRADO DE GESTÃO DE CUSTOS DE FROTA")
+    st.title("Apontamento de Campo")
+    st.caption("SIGCF — Sistema Integrado de Gestão de Custos de Frota")
 
 pagina = st.tabs(["📝 Novo Apontamento", "📋 Consultar", "📊 Resumo por Frota"])
 
@@ -209,36 +328,123 @@ with pagina[0]:
     st.markdown('<div class="sec">Registrar apontamento</div>', unsafe_allow_html=True)
 
     with st.form("form_apontamento", clear_on_submit=True):
-        col1, col2 = st.columns(2)
+        st.markdown("**Identificação**")
+        col1, col2, col3 = st.columns(3)
         with col1:
             data_ap = st.date_input("📅 Data", value=date.today())
+        with col2:
+            frota = st.text_input("🚜 Frota (ID)", placeholder="Ex: 3396")
+        with col3:
             operador = st.selectbox(
                 "👤 Operador",
                 options=colaboradores if colaboradores else ["Sem operadores cadastrados"],
             )
-            frota = st.text_input("🚜 Frota (Placa / ID)", placeholder="Ex: 3337 ou ABC-1234")
-        with col2:
-            h_inicial = st.number_input("⏱️ Horímetro Inicial", min_value=0.0, step=0.1, format="%.1f")
-            h_final = st.number_input("⏱️ Horímetro Final", min_value=0.0, step=0.1, format="%.1f")
+
+        st.markdown("**Operação**")
+        c_op1, c_op2 = st.columns(2)
+        with c_op1:
+            succao = st.selectbox("⚙️ Operação", options=OPERACOES)
+        with c_op2:
+            talhoes = st.text_input(
+                "🌾 Talhão(ões) / área",
+                placeholder="Ex: córrego do campo pasto 547",
+            )
+        local = st.text_input(
+            "📍 Local complementar (opcional)",
+            placeholder="Ex: Retiro Norte — use se quiser detalhar além do talhão",
+        )
+
+        st.markdown("**Horários da operação**")
+        t1, t2, t3, t4 = st.columns(4)
+        with t1:
+            inicio_operacao = st.text_input("▶ Início operação", placeholder="08:20")
+        with t2:
+            fim_operacao = st.text_input("⏹ Fim operação", placeholder="17:00")
+        with t3:
+            inicio_turno = st.text_input("▶ Início turno", placeholder="06:31")
+        with t4:
+            fim_turno = st.text_input("⏹ Fim turno", placeholder="18:14")
+
+        st.markdown("**Horímetro**")
+        h1, h2, h3 = st.columns(3)
+        with h1:
+            h_inicial = st.number_input("Horímetro inicial", min_value=0.0, step=0.1, format="%.1f")
+        with h2:
+            h_final = st.number_input("Horímetro final", min_value=0.0, step=0.1, format="%.1f")
+        with h3:
             horas = round(h_final - h_inicial, 1)
             if horas > 0:
-                st.metric("🕐 Horas Trabalhadas", f"{horas:.1f} h")
+                st.metric("Horas (horímetro)", f"{horas:.1f} h")
             elif h_final > 0 and horas <= 0:
-                st.warning("⚠️ Horímetro final menor que inicial.")
+                st.warning("Horímetro final menor que inicial.")
 
-        succao = st.selectbox("⚙️ Operação / Sucção", options=OPERACOES)
-        local = st.text_input("📍 Local / Talhão", placeholder="Ex: Retiro Norte - Talhão 03")
+        st.markdown("**Intervalo (opcional)**")
+        a1, a2 = st.columns(2)
+        with a1:
+            almoco = st.text_input("🍽 Almoço (saída)", placeholder="11:35")
+        with a2:
+            retorno = st.text_input("↩ Retorno", placeholder="12:26")
+
+        with st.expander("🧪 Insumos / Defensivos (opcional)", expanded=False):
+            st.caption(
+                "Preencha **somente** quando houve aplicação de adubo, defensivo, calda ou similar. "
+                + OPERACOES_SEM_INSUMO_HINT
+                + " Se não houve aplicação, deixe tudo em branco — nada será gravado no banco."
+            )
+            i1, i2, i3 = st.columns([2, 1, 1])
+            with i1:
+                insumo = st.text_input(
+                    "Insumo / defensivo principal",
+                    placeholder="Ex: fipronil (deixe vazio se não aplicou)",
+                )
+            with i2:
+                quantidade_insumo = st.text_input(
+                    "Quantidade",
+                    placeholder="Ex: 0.150",
+                )
+            with i3:
+                unidade = st.selectbox("Unidade", options=UNIDADES_INSUMO)
+            insumos_extras = st.text_area(
+                "Outros insumos ou calda",
+                height=60,
+                placeholder="Ex: Fordor 0.300 GM | 800 lts calda",
+            )
+
         obs = st.text_area("📝 Observação", height=60)
         submitted = st.form_submit_button("✅ Registrar Apontamento", use_container_width=True, type="primary")
 
     if submitted:
+        hi_op = parse_hora_txt(inicio_operacao)
+        hf_op = parse_hora_txt(fim_operacao)
+        hi_turno = parse_hora_txt(inicio_turno)
+        hf_turno = parse_hora_txt(fim_turno)
+        hi_almoco = parse_hora_txt(almoco)
+        hi_retorno = parse_hora_txt(retorno)
+
+        erros = []
         if not frota.strip():
-            st.error("⚠️ Informe a frota.")
-        elif h_final <= h_inicial:
-            st.error("⚠️ Horímetro final deve ser maior que o inicial.")
-        elif not local.strip():
-            st.error("⚠️ Informe o local.")
+            erros.append("Informe a frota.")
+        if h_final <= h_inicial:
+            erros.append("Horímetro final deve ser maior que o inicial.")
+        if not talhoes.strip() and not local.strip():
+            erros.append("Informe o talhão ou local.")
+        for lbl, val, raw in [
+            ("Início operação", hi_op, inicio_operacao),
+            ("Fim operação", hf_op, fim_operacao),
+            ("Início turno", hi_turno, inicio_turno),
+            ("Fim turno", hf_turno, fim_turno),
+            ("Almoço", hi_almoco, almoco),
+            ("Retorno", hi_retorno, retorno),
+        ]:
+            if str(raw or "").strip() and not val:
+                erros.append(f"{lbl}: use HH:MM (ex: 08:20).")
+
+        if erros:
+            for e in erros:
+                st.error(f"⚠️ {e}")
         else:
+            ins = campos_insumo(insumo, quantidade_insumo, unidade, insumos_extras)
+
             novo = {
                 "data": str(data_ap),
                 "operador": operador,
@@ -246,8 +452,16 @@ with pagina[0]:
                 "h_inicial": h_inicial,
                 "h_final": h_final,
                 "succao": succao,
-                "local": local.strip().upper(),
-                "observacao": obs.strip() or None,
+                "talhoes": nulo_se_vazio(talhoes.strip().upper() if talhoes else ""),
+                "local": nulo_se_vazio(local.strip().upper() if local else ""),
+                "inicio_turno": hi_turno,
+                "fim_turno": hf_turno,
+                "inicio_operacao": hi_op,
+                "fim_operacao": hf_op,
+                "insumo": ins["insumo"],
+                "quantidade_insumo": ins["quantidade_insumo"],
+                "unidade": ins["unidade"],
+                "observacao": montar_observacao(obs, hi_almoco, hi_retorno),
             }
             try:
                 supabase.table("apontamento_campo").insert(novo).execute()
@@ -293,10 +507,9 @@ with pagina[1]:
         m2.metric("Total Horas Trabalhadas", f"{total_h:.1f} h")
         m3.metric("Frotas Únicas", df["frota"].nunique())
 
-        df_show = df[["data", "operador", "frota", "h_inicial", "h_final",
-                      "horas_trabalhadas", "succao", "local", "observacao"]].copy()
-        df_show.columns = ["Data", "Operador", "Frota", "H.Ini", "H.Fin",
-                           "Horas", "Operação", "Local", "Obs"]
+        cols_disp = [c for c in COLUNAS_CONSULTA if c in df.columns]
+        df_show = df[cols_disp].copy()
+        df_show.columns = [LABELS_CONSULTA.get(c, c) for c in cols_disp]
         dark_table(df_show.head(50), height=360)
 
         st.download_button(
