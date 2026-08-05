@@ -406,11 +406,11 @@ with pagina[0]:
                 unidade = st.selectbox("Unidade", options=UNIDADES_INSUMO)
             insumos_extras = st.text_area(
                 "Outros insumos ou calda",
-                height=60,
+                height=68,
                 placeholder="Ex: Fordor 0.300 GM | 800 lts calda",
             )
 
-        obs = st.text_area("📝 Observação", height=60)
+        obs = st.text_area("📝 Observação", height=68)
         submitted = st.form_submit_button("✅ Registrar Apontamento", use_container_width=True, type="primary")
 
     if submitted:
