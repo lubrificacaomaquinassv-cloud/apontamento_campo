@@ -235,14 +235,18 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @st.cache_data(ttl=60)
 def carregar_colaboradores():
-    res = (
-        supabase.table("dim_colaborador")
-        .select("nome")
-        .eq("ativo", True)
-        .order("nome")
-        .execute()
-    )
-    return [r["nome"] for r in (res.data or [])]
+    try:
+        res = (
+            supabase.table("dim_colaborador")
+            .select("nome")
+            .eq("ativo", True)
+            .order("nome")
+            .execute()
+        )
+        return [r["nome"] for r in (res.data or [])]
+    except Exception as e:
+        st.error(f"Erro ao carregar operadores (dim_colaborador): {e}")
+        return []
 
 
 @st.cache_data(ttl=10)
@@ -406,11 +410,10 @@ with pagina[0]:
                 unidade = st.selectbox("Unidade", options=UNIDADES_INSUMO)
             insumos_extras = st.text_area(
                 "Outros insumos ou calda",
-                height=68,
                 placeholder="Ex: Fordor 0.300 GM | 800 lts calda",
             )
 
-        obs = st.text_area("📝 Observação", height=68)
+        obs = st.text_area("📝 Observação")
         submitted = st.form_submit_button("✅ Registrar Apontamento", use_container_width=True, type="primary")
 
     if submitted:
