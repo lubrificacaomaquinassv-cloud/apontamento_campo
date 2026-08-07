@@ -181,6 +181,149 @@ def campos_insumo(insumo, qtd_txt, unidade, extras):
     return {"insumo": texto, "quantidade_insumo": qtd_db, "unidade": un_db}
 
 
+_UNIDADES_RE = r"ml|lts?|L|kg|g|GM|UN"
+
+
+def _parse_item_insumo(texto):
+    """Extrai produto, quantidade e unidade de um fragmento de texto."""
+    s = str(texto or "").strip()
+    if not s:
+        return None
+    m = re.match(
+        rf"^(.+?)\s+([\d,\.]+)\s*({_UNIDADES_RE})\s*$",
+        s,
+        re.IGNORECASE,
+    )
+    if m:
+        qtd = parse_qtd_insumo(m.group(2))
+        if qtd is not None:
+            return {
+                "produto": m.group(1).strip(),
+                "quantidade": qtd,
+                "unidade": m.group(3).upper().replace("LTS", "L"),
+            }
+    m = re.match(
+        rf"^([\d,\.]+)\s*({_UNIDADES_RE})\s+(.+)$",
+        s,
+        re.IGNORECASE,
+    )
+    if m:
+        qtd = parse_qtd_insumo(m.group(1))
+        if qtd is not None:
+            un = m.group(2).upper().replace("LTS", "L")
+            return {
+                "produto": m.group(3).strip(),
+                "quantidade": qtd,
+                "unidade": un,
+            }
+    return None
+
+
+def parse_insumos_operacao(linhas, extras_txt=""):
+    """Linhas = lista de (produto, qtd_txt, unidade). Retorna itens estruturados."""
+    itens = []
+    for prod, qtd_txt, un in linhas:
+        prod = str(prod or "").strip()
+        qtd = parse_qtd_insumo(qtd_txt)
+        if prod and qtd is not None and un and un != "—":
+            itens.append({
+                "produto": prod,
+                "quantidade": qtd,
+                "unidade": str(un).upper().replace("LTS", "L"),
+            })
+    ext = str(extras_txt or "").strip()
+    if ext:
+        for parte in re.split(r"[|;\n]+", ext):
+            item = _parse_item_insumo(parte)
+            if item:
+                itens.append(item)
+    return itens
+
+
+def _operacao_valida(nome):
+    return bool(nome) and nome not in ("—", "— Selecione —")
+
+
+def operacao_preenchida(op):
+    """True se o bloco de operação tem algum dado relevante."""
+    if _operacao_valida(op.get("operacao")):
+        return True
+    for k in ("talhoes", "local", "inicio_operacao", "fim_operacao"):
+        if str(op.get(k) or "").strip():
+            return True
+    if op.get("h_ini_op", 0) > 0 or op.get("h_fim_op", 0) > 0:
+        return True
+    return bool(op.get("insumos"))
+
+
+def montar_resumo_pai(operacoes):
+    """Agrega campos flat em apontamento_campo a partir das operações."""
+    ops = [o for o in operacoes if operacao_preenchida(o)]
+    if not ops:
+        return {}
+    succoes = [o["operacao"] for o in ops if o.get("operacao")]
+    talhoes = [o["talhoes"] for o in ops if o.get("talhoes")]
+    locais = [o["local"] for o in ops if o.get("local")]
+    inicios = [o["inicio_operacao"] for o in ops if o.get("inicio_operacao")]
+    fins = [o["fim_operacao"] for o in ops if o.get("fim_operacao")]
+
+    todos_insumos = []
+    qtd_pri, un_pri = None, None
+    for o in ops:
+        for it in o.get("insumos") or []:
+            todos_insumos.append(f"{it['produto']} {it['quantidade']:g} {it['unidade']}")
+        if o.get("insumos") and qtd_pri is None:
+            it0 = o["insumos"][0]
+            qtd_pri = it0["quantidade"]
+            un_pri = it0["unidade"]
+
+    succao_res = succoes[0] if len(set(succoes)) == 1 else (succoes[0] if succoes else None)
+    if len(set(succoes)) > 1:
+        succao_res = succoes[0]
+
+    return {
+        "succao": succao_res,
+        "talhoes": " | ".join(talhoes) if talhoes else None,
+        "local": locais[0] if locais else None,
+        "inicio_operacao": min(inicios) if inicios else None,
+        "fim_operacao": max(fins) if fins else None,
+        "insumo": " | ".join(todos_insumos) if todos_insumos else None,
+        "quantidade_insumo": qtd_pri,
+        "unidade": un_pri,
+    }
+
+
+def validar_operacoes(operacoes, exige_local=True):
+    """Valida lista de operações. Retorna lista de mensagens de erro."""
+    ops = [o for o in operacoes if operacao_preenchida(o)]
+    erros = []
+    if not ops:
+        erros.append("Informe ao menos uma operação.")
+        return erros
+    for i, op in enumerate(ops, 1):
+        if not _operacao_valida(op.get("operacao")):
+            erros.append(f"Operação {i}: selecione o tipo de operação.")
+        if exige_local and not op.get("talhoes") and not op.get("local"):
+            erros.append(f"Operação {i}: informe talhão ou local.")
+        for lbl, val, raw in [
+            ("Início operação", op.get("inicio_operacao"), op.get("_raw_inicio")),
+            ("Fim operação", op.get("fim_operacao"), op.get("_raw_fim")),
+        ]:
+            if str(raw or "").strip() and not val:
+                erros.append(f"Operação {i} — {lbl}: use HH:MM (ex: 08:20).")
+        h_ini = op.get("h_ini_op") or 0
+        h_fim = op.get("h_fim_op") or 0
+        if h_fim > 0 and h_ini > 0 and h_fim <= h_ini:
+            erros.append(f"Operação {i}: horímetro final deve ser maior que o inicial.")
+        if op.get("insumos") and not _operacao_valida(op.get("operacao")):
+            erros.append(f"Operação {i}: insumo informado — selecione a operação.")
+    return erros
+
+
+MAX_OPERACOES = 8
+MAX_INSUMOS_POR_OP = 5
+
+
 def nulo_se_vazio(val):
     """Texto vazio → None (NULL). Horários já vêm None quando em branco."""
     if val is None:
@@ -231,6 +374,93 @@ OPERACOES_SEM_INSUMO_HINT = (
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+@st.cache_data(ttl=300)
+def _mapa_talhoes():
+    try:
+        res = supabase.table("dim_talhoes").select("id,codigo").eq("ativo", True).execute()
+        return {
+            str(r["codigo"]).strip(): r["id"]
+            for r in (res.data or [])
+            if r.get("codigo")
+        }
+    except Exception:
+        return {}
+
+
+@st.cache_data(ttl=300)
+def _mapa_locais():
+    try:
+        res = supabase.table("dim_locais").select("id,nome").eq("ativo", True).execute()
+        out = {}
+        for r in res.data or []:
+            chave = str(r.get("nome") or "").strip().upper()
+            if chave:
+                out[chave] = r["id"]
+        return out
+    except Exception:
+        return {}
+
+
+def resolver_talhao_id(talhoes_txt):
+    """Tenta FK em dim_talhoes a partir do código numérico no texto."""
+    txt = str(talhoes_txt or "").upper()
+    mapa = _mapa_talhoes()
+    for cod in re.findall(r"\b(\d{2,4})\b", txt):
+        if cod in mapa:
+            return mapa[cod]
+    return None
+
+
+def resolver_retiro_id(local_txt, talhoes_txt):
+    """Tenta FK em dim_locais pelo local complementar ou texto do talhão."""
+    mapa = _mapa_locais()
+    for fonte in (local_txt, talhoes_txt):
+        txt = str(fonte or "").upper()
+        if not txt:
+            continue
+        for nome, lid in mapa.items():
+            if nome in txt:
+                return lid
+    return None
+
+
+def gravar_fato_insumos(
+    id_apontamento,
+    operacao,
+    talhoes,
+    local,
+    inicio_operacao,
+    fim_operacao,
+    h_inicial,
+    h_final,
+    itens_insumo,
+):
+    """Grava fato_operacoes + fato_aplicacao_insumos. Retorna (id_operacao, qtd_insumos)."""
+    op_row = {
+        "id_apontamento": id_apontamento,
+        "operacao": operacao,
+        "talhao_id": resolver_talhao_id(talhoes),
+        "retiro_id": resolver_retiro_id(local, talhoes),
+        "inicio_operacao": inicio_operacao,
+        "fim_operacao": fim_operacao,
+        "horimetro_inicial_operacao": h_inicial if h_inicial > 0 else None,
+        "horimetro_final_operacao": h_final if h_final > 0 else None,
+    }
+    res_op = supabase.table("fato_operacoes").insert(op_row).execute()
+    id_operacao = res_op.data[0]["id"]
+    rows = [
+        {
+            "id_operacao": id_operacao,
+            "produto": it["produto"],
+            "quantidade": it["quantidade"],
+            "unidade": it["unidade"],
+        }
+        for it in itens_insumo
+    ]
+    supabase.table("fato_aplicacao_insumos").insert(rows).execute()
+    return id_operacao, len(rows)
 
 
 @st.cache_data(ttl=60)
@@ -310,6 +540,7 @@ OPERACOES = [
     "HERCULES", "PUXAR LINK", "FENO", "LIMPEZA DE BAIA", "ESPLANADA",
     "SERVICOS DIVERSOS", "LIMPEZA DE COCHO", "OUTRA",
 ]
+OPERACOES_FORM = ["— Selecione —"] + OPERACOES
 
 colaboradores = carregar_colaboradores()
 
@@ -331,8 +562,28 @@ pagina = st.tabs(["📝 Novo Apontamento", "📋 Consultar", "📊 Resumo por Fr
 with pagina[0]:
     st.markdown('<div class="sec">Registrar apontamento</div>', unsafe_allow_html=True)
 
+    if "num_operacoes" not in st.session_state:
+        st.session_state.num_operacoes = 1
+
+    b1, b2, b3 = st.columns([1.2, 1.2, 4])
+    with b1:
+        if st.button("➕ Adicionar operação", key="btn_add_op"):
+            if st.session_state.num_operacoes < MAX_OPERACOES:
+                st.session_state.num_operacoes += 1
+                st.rerun()
+    with b2:
+        if st.button("➖ Remover operação", key="btn_rem_op"):
+            if st.session_state.num_operacoes > 1:
+                st.session_state.num_operacoes -= 1
+                st.rerun()
+    with b3:
+        st.caption(
+            f"**{st.session_state.num_operacoes}** operação(ões) neste turno — "
+            "use ➕ para casos como Josivaldo (548 + 550 no mesmo dia)."
+        )
+
     with st.form("form_apontamento", clear_on_submit=True):
-        st.markdown("**Identificação**")
+        st.markdown("**Identificação do turno**")
         col1, col2, col3 = st.columns(3)
         with col1:
             data_ap = st.date_input("📅 Data", value=date.today())
@@ -344,96 +595,174 @@ with pagina[0]:
                 options=colaboradores if colaboradores else ["Sem operadores cadastrados"],
             )
 
-        st.markdown("**Operação**")
-        c_op1, c_op2 = st.columns(2)
-        with c_op1:
-            succao = st.selectbox("⚙️ Operação", options=OPERACOES)
-        with c_op2:
-            talhoes = st.text_input(
-                "🌾 Talhão(ões) / área",
-                placeholder="Ex: córrego do campo pasto 547",
-            )
-        local = st.text_input(
-            "📍 Local complementar (opcional)",
-            placeholder="Ex: Retiro Norte — use se quiser detalhar além do talhão",
-        )
-
-        st.markdown("**Horários da operação**")
+        st.markdown("**Horários do turno**")
         t1, t2, t3, t4 = st.columns(4)
         with t1:
-            inicio_operacao = st.text_input("▶ Início operação", placeholder="08:20")
+            inicio_turno = st.text_input("▶ Início turno", placeholder="06:36")
         with t2:
-            fim_operacao = st.text_input("⏹ Fim operação", placeholder="17:00")
+            fim_turno = st.text_input("⏹ Fim turno", placeholder="18:23")
         with t3:
-            inicio_turno = st.text_input("▶ Início turno", placeholder="06:31")
+            almoco = st.text_input("🍽 Almoço (saída)", placeholder="11:42")
         with t4:
-            fim_turno = st.text_input("⏹ Fim turno", placeholder="18:14")
+            retorno = st.text_input("↩ Retorno", placeholder="13:00")
 
-        st.markdown("**Horímetro**")
+        st.markdown("**Horímetro do turno**")
         h1, h2, h3 = st.columns(3)
         with h1:
-            h_inicial = st.number_input("Horímetro inicial", min_value=0.0, step=0.1, format="%.1f")
+            h_inicial = st.number_input(
+                "Horímetro inicial (turno)", min_value=0.0, step=0.1, format="%.1f"
+            )
         with h2:
-            h_final = st.number_input("Horímetro final", min_value=0.0, step=0.1, format="%.1f")
+            h_final = st.number_input(
+                "Horímetro final (turno)", min_value=0.0, step=0.1, format="%.1f"
+            )
         with h3:
             horas = round(h_final - h_inicial, 1)
             if horas > 0:
-                st.metric("Horas (horímetro)", f"{horas:.1f} h")
+                st.metric("Horas (horímetro turno)", f"{horas:.1f} h")
             elif h_final > 0 and horas <= 0:
                 st.warning("Horímetro final menor que inicial.")
 
-        st.markdown("**Intervalo (opcional)**")
-        a1, a2 = st.columns(2)
-        with a1:
-            almoco = st.text_input("🍽 Almoço (saída)", placeholder="11:35")
-        with a2:
-            retorno = st.text_input("↩ Retorno", placeholder="12:26")
-
-        with st.expander("🧪 Insumos / Defensivos (opcional)", expanded=False):
-            st.caption(
-                "Preencha **somente** quando houve aplicação de adubo, defensivo, calda ou similar. "
-                + OPERACOES_SEM_INSUMO_HINT
-                + " Se não houve aplicação, deixe tudo em branco — nada será gravado no banco."
-            )
-            i1, i2, i3 = st.columns([2, 1, 1])
-            with i1:
-                insumo = st.text_input(
-                    "Insumo / defensivo principal",
-                    placeholder="Ex: fipronil (deixe vazio se não aplicou)",
+        operacoes_form = []
+        for idx in range(st.session_state.num_operacoes):
+            st.markdown(f"---")
+            st.markdown(f"**Operação {idx + 1}**")
+            c_op1, c_op2 = st.columns(2)
+            with c_op1:
+                succao = st.selectbox(
+                    "⚙️ Operação",
+                    options=OPERACOES_FORM,
+                    key=f"op_{idx}_succao",
                 )
-            with i2:
-                quantidade_insumo = st.text_input(
-                    "Quantidade",
-                    placeholder="Ex: 0.150",
+            with c_op2:
+                talhoes = st.text_input(
+                    "🌾 Talhão / área",
+                    placeholder="Ex: pasto 548 (deixe vazio se não houver)",
+                    key=f"op_{idx}_talhoes",
                 )
-            with i3:
-                unidade = st.selectbox("Unidade", options=UNIDADES_INSUMO)
-            insumos_extras = st.text_area(
-                "Outros insumos ou calda",
-                placeholder="Ex: Fordor 0.300 GM | 800 lts calda",
+            local = st.text_input(
+                "📍 Local / retiro (opcional)",
+                placeholder="Ex: Córrego do Campo",
+                key=f"op_{idx}_local",
             )
 
-        obs = st.text_area("📝 Observação")
-        submitted = st.form_submit_button("✅ Registrar Apontamento", use_container_width=True, type="primary")
+            o1, o2, o3, o4 = st.columns(4)
+            with o1:
+                inicio_operacao = st.text_input(
+                    "▶ Início operação", placeholder="08:00", key=f"op_{idx}_ini_op"
+                )
+            with o2:
+                fim_operacao = st.text_input(
+                    "⏹ Fim operação", placeholder="10:43", key=f"op_{idx}_fim_op"
+                )
+            with o3:
+                h_ini_op = st.number_input(
+                    "HR ini. operação",
+                    min_value=0.0,
+                    step=0.1,
+                    format="%.1f",
+                    key=f"op_{idx}_h_ini",
+                )
+            with o4:
+                h_fim_op = st.number_input(
+                    "HR fim operação",
+                    min_value=0.0,
+                    step=0.1,
+                    format="%.1f",
+                    key=f"op_{idx}_h_fim",
+                )
+
+            with st.expander(
+                f"🧪 Insumos — operação {idx + 1} (opcional)",
+                expanded=False,
+            ):
+                st.caption(
+                    "Preencha quando houve aplicação neste talhão/operação. "
+                    + OPERACOES_SEM_INSUMO_HINT
+                    + " Sem insumo → nada vai para fato_operacoes."
+                )
+                linhas_insumo = []
+                for j in range(MAX_INSUMOS_POR_OP):
+                    ic1, ic2, ic3 = st.columns([2, 1, 1])
+                    with ic1:
+                        prod = st.text_input(
+                            f"Produto {j + 1}",
+                            placeholder="Ex: Fipronil, Fordor, Calda",
+                            key=f"op_{idx}_ins_{j}_prod",
+                        )
+                    with ic2:
+                        qtd = st.text_input(
+                            "Qtd",
+                            placeholder="0.150",
+                            key=f"op_{idx}_ins_{j}_qtd",
+                        )
+                    with ic3:
+                        un = st.selectbox(
+                            "Un.",
+                            options=UNIDADES_INSUMO,
+                            key=f"op_{idx}_ins_{j}_un",
+                        )
+                    linhas_insumo.append((prod, qtd, un))
+                insumos_extras = st.text_area(
+                    "Outros (texto livre)",
+                    placeholder="Ex: 300 lts calda",
+                    key=f"op_{idx}_ins_extras",
+                )
+
+            operacoes_form.append({
+                "idx": idx,
+                "operacao": succao,
+                "talhoes": talhoes,
+                "local": local,
+                "inicio_operacao_raw": inicio_operacao,
+                "fim_operacao_raw": fim_operacao,
+                "h_ini_op": h_ini_op,
+                "h_fim_op": h_fim_op,
+                "linhas_insumo": linhas_insumo,
+                "insumos_extras": insumos_extras,
+            })
+
+        obs = st.text_area("📝 Observação geral")
+        submitted = st.form_submit_button(
+            "✅ Registrar Apontamento", use_container_width=True, type="primary"
+        )
 
     if submitted:
-        hi_op = parse_hora_txt(inicio_operacao)
-        hf_op = parse_hora_txt(fim_operacao)
         hi_turno = parse_hora_txt(inicio_turno)
         hf_turno = parse_hora_txt(fim_turno)
         hi_almoco = parse_hora_txt(almoco)
         hi_retorno = parse_hora_txt(retorno)
 
+        operacoes = []
+        for raw in operacoes_form:
+            hi_op = parse_hora_txt(raw["inicio_operacao_raw"])
+            hf_op = parse_hora_txt(raw["fim_operacao_raw"])
+            insumos = parse_insumos_operacao(
+                raw["linhas_insumo"], raw["insumos_extras"]
+            )
+            operacoes.append({
+                "operacao": raw["operacao"] if _operacao_valida(raw["operacao"]) else None,
+                "talhoes": nulo_se_vazio(
+                    raw["talhoes"].strip().upper() if raw["talhoes"] else ""
+                ),
+                "local": nulo_se_vazio(
+                    raw["local"].strip().upper() if raw["local"] else ""
+                ),
+                "inicio_operacao": hi_op,
+                "fim_operacao": hf_op,
+                "_raw_inicio": raw["inicio_operacao_raw"],
+                "_raw_fim": raw["fim_operacao_raw"],
+                "h_ini_op": raw["h_ini_op"],
+                "h_fim_op": raw["h_fim_op"],
+                "insumos": insumos,
+            })
+
         erros = []
         if not frota.strip():
             erros.append("Informe a frota.")
         if h_final <= h_inicial:
-            erros.append("Horímetro final deve ser maior que o inicial.")
-        if not talhoes.strip() and not local.strip():
-            erros.append("Informe o talhão ou local.")
+            erros.append("Horímetro final do turno deve ser maior que o inicial.")
         for lbl, val, raw in [
-            ("Início operação", hi_op, inicio_operacao),
-            ("Fim operação", hf_op, fim_operacao),
             ("Início turno", hi_turno, inicio_turno),
             ("Fim turno", hf_turno, fim_turno),
             ("Almoço", hi_almoco, almoco),
@@ -441,36 +770,66 @@ with pagina[0]:
         ]:
             if str(raw or "").strip() and not val:
                 erros.append(f"{lbl}: use HH:MM (ex: 08:20).")
+        erros.extend(validar_operacoes(operacoes, exige_local=False))
+
+        ops_ativas = [o for o in operacoes if operacao_preenchida(o)]
 
         if erros:
             for e in erros:
                 st.error(f"⚠️ {e}")
         else:
-            ins = campos_insumo(insumo, quantidade_insumo, unidade, insumos_extras)
-
+            resumo = montar_resumo_pai(operacoes)
             novo = {
                 "data": str(data_ap),
                 "operador": operador,
                 "frota": frota.strip().upper(),
                 "h_inicial": h_inicial,
                 "h_final": h_final,
-                "succao": succao,
-                "talhoes": nulo_se_vazio(talhoes.strip().upper() if talhoes else ""),
-                "local": nulo_se_vazio(local.strip().upper() if local else ""),
+                "succao": resumo.get("succao"),
+                "talhoes": resumo.get("talhoes"),
+                "local": resumo.get("local"),
                 "inicio_turno": hi_turno,
                 "fim_turno": hf_turno,
-                "inicio_operacao": hi_op,
-                "fim_operacao": hf_op,
-                "insumo": ins["insumo"],
-                "quantidade_insumo": ins["quantidade_insumo"],
-                "unidade": ins["unidade"],
+                "inicio_operacao": resumo.get("inicio_operacao"),
+                "fim_operacao": resumo.get("fim_operacao"),
+                "insumo": resumo.get("insumo"),
+                "quantidade_insumo": resumo.get("quantidade_insumo"),
+                "unidade": resumo.get("unidade"),
                 "observacao": montar_observacao(obs, hi_almoco, hi_retorno),
             }
             try:
-                supabase.table("apontamento_campo").insert(novo).execute()
+                res_ap = supabase.table("apontamento_campo").insert(novo).execute()
+                id_apontamento = res_ap.data[0]["id"]
+
+                ops_com_insumo = [
+                    o for o in ops_ativas if o.get("insumos")
+                ]
+                detalhes_fato = []
+                for op in ops_com_insumo:
+                    id_operacao, n_ins = gravar_fato_insumos(
+                        id_apontamento,
+                        op["operacao"],
+                        op.get("talhoes") or "",
+                        op.get("local") or "",
+                        op.get("inicio_operacao"),
+                        op.get("fim_operacao"),
+                        op.get("h_ini_op") or 0,
+                        op.get("h_fim_op") or 0,
+                        op["insumos"],
+                    )
+                    tal = op.get("talhoes") or "—"
+                    detalhes_fato.append(f"#{id_operacao} ({tal}, {n_ins} ins.)")
+
+                msg_extra = ""
+                if detalhes_fato:
+                    msg_extra = f" | fato_operacoes: {', '.join(detalhes_fato)}"
+
                 st.success(
-                    f"✅ Apontamento salvo! {frota.upper()} | {operador} | {horas:.1f}h | {succao}"
+                    f"✅ Apontamento #{id_apontamento} salvo! "
+                    f"{frota.upper()} | {operador} | {horas:.1f}h | "
+                    f"{len(ops_ativas)} op(s){msg_extra}"
                 )
+                st.session_state.num_operacoes = 1
                 st.balloons()
                 st.cache_data.clear()
                 st.rerun()
