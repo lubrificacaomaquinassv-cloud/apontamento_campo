@@ -18,7 +18,7 @@ exigir_acesso("Apontamento de Campo")
 
 st.markdown("""
 <style>
-/* Tema teste Lovable + Segoe UI — v3 (faixa azul no topo) */
+/* Tema SIGCF — v4 polimento (Lovable + Segoe UI) */
 :root{
  --sigcf-bg:#0a1409;--sigcf-card:#0f1f12;--sigcf-border:#2a4030;
  --sigcf-text:#e8edd0;--sigcf-label:#8aab80;--sigcf-green:#6fcf60;
@@ -42,7 +42,7 @@ h1,h2,h3,h4{
 .sigcf-header-band{
  background:linear-gradient(145deg,var(--sigcf-navy-a) 0%,var(--sigcf-navy-b) 100%);
  border:1px solid rgba(201,162,39,.35);border-bottom:2px solid var(--sigcf-green);
- border-radius:12px;padding:14px 18px;margin:0 0 12px;
+ border-radius:12px;padding:14px 18px;margin:0 0 20px;
  box-shadow:0 6px 24px rgba(0,0,0,.35);}
 .sigcf-header-inner{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
 .sigcf-header-text{flex:1;min-width:220px;}
@@ -117,17 +117,29 @@ div[data-testid="stMetricValue"]{
 
 .stTabs [data-baseweb="tab-list"]{
  background:linear-gradient(180deg,var(--sigcf-navy-b) 0%,var(--sigcf-card) 100%);
- border-bottom:2px solid var(--sigcf-green);gap:8px;padding-top:4px;border-radius:0 0 8px 8px;}
-.stTabs [data-baseweb="tab"]{
+ border-bottom:2px solid var(--sigcf-green)!important;gap:4px;
+ padding:8px 10px 0;border-radius:0 0 10px 10px;margin-top:0;}
+.stTabs [data-baseweb="tab"],
+.stTabs button[data-baseweb="tab"]{
  color:var(--sigcf-label)!important;font-family:var(--sigcf-font)!important;
- font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
-.stTabs [data-baseweb="tab"]:hover{color:var(--sigcf-gold)!important;}
+ font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+ font-size:12px!important;border-bottom:3px solid transparent!important;
+ padding-bottom:10px!important;background:transparent!important;}
+.stTabs [data-baseweb="tab"]:hover,
+.stTabs button[data-baseweb="tab"]:hover{color:var(--sigcf-gold)!important;}
 .stTabs button[data-baseweb="tab"][aria-selected="true"],
 .stTabs [data-baseweb="tab"][aria-selected="true"]{
- color:var(--sigcf-gold)!important;}
+ color:var(--sigcf-gold)!important;
+ border-bottom:3px solid var(--sigcf-green)!important;}
 .stTabs [data-baseweb="tab-highlight"]{
- background-color:var(--sigcf-green)!important;height:3px!important;}
-.stTabs [data-baseweb="tab-border"]{background-color:var(--sigcf-border)!important;}
+ background-color:var(--sigcf-green)!important;height:3px!important;
+ bottom:0!important;}
+.stTabs [data-baseweb="tab-border"]{
+ background-color:var(--sigcf-border)!important;height:1px!important;}
+.stTabs button[data-baseweb="tab"] p,
+.stTabs [data-baseweb="tab"] p{color:inherit!important;font-size:12px!important;
+ letter-spacing:0.12em!important;text-transform:uppercase!important;}
+[data-testid="stTabs"]{margin-top:4px;margin-bottom:12px;}
 [data-testid="stExpander"]{
  background:var(--sigcf-card)!important;border:1px solid var(--sigcf-border)!important;border-radius:10px;}
 [data-testid="stExpander"] summary{
@@ -135,14 +147,23 @@ div[data-testid="stMetricValue"]{
  text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
 .stButton button,[data-testid="stFormSubmitButton"] button{
  background:linear-gradient(180deg,#4a9e3f,#3d8534)!important;color:#fff!important;
- border:1px solid var(--sigcf-gold)!important;
- font-family:var(--sigcf-font)!important;font-weight:700;letter-spacing:0.1em;
- text-transform:uppercase;border-radius:8px;}
+ border:1px solid rgba(201,162,39,.55)!important;
+ font-family:var(--sigcf-font)!important;font-weight:700;letter-spacing:0.12em;
+ text-transform:uppercase;border-radius:8px;font-size:0.78rem!important;
+ padding:0.45rem 0.85rem!important;min-height:2.25rem!important;}
 .stButton button:hover,[data-testid="stFormSubmitButton"] button:hover{
  background:linear-gradient(180deg,#3d8534,#2f6a28)!important;
  border-color:var(--sigcf-green)!important;}
-.stButton button p,[data-testid="stFormSubmitButton"] button p{color:#ffffff!important;}
+.stButton button p,[data-testid="stFormSubmitButton"] button p{
+ color:#ffffff!important;font-size:0.78rem!important;letter-spacing:0.12em!important;}
 hr{border-color:var(--sigcf-border)!important;}
+
+/* Força verde na aba ativa — anula vermelho padrão Streamlit */
+.stTabs [data-baseweb="tab-highlight"],
+div[data-testid="stTabs"] [data-baseweb="tab-highlight"]{
+ background-color:var(--sigcf-green)!important;background:var(--sigcf-green)!important;}
+.stTabs [data-baseweb="tab-list"] [role="tab"][aria-selected="true"]{
+ box-shadow:inset 0 -3px 0 0 var(--sigcf-green)!important;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -628,7 +649,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-pagina = st.tabs(["📝 Novo Apontamento", "📋 Consultar", "📊 Resumo por Frota"])
+pagina = st.tabs(["Novo Apontamento", "Consultar", "Resumo por Frota"])
 
 # ═══════════════════════════════════════════
 # NOVO APONTAMENTO
