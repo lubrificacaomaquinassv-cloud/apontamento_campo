@@ -18,59 +18,80 @@ exigir_acesso("Apontamento de Campo")
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&display=swap');
-[data-testid="stAppViewContainer"]{background:#0a1409;}
-[data-testid="stSidebar"]{background:#111c10;border-right:1px solid #1e2e1c;}
-[data-testid="stHeader"]{background:#0a1409;}
-h1,h2,h3,h4,p,span,label{color:#e8edd0;}
-h1{font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
-.stCaption,[data-testid="stCaptionContainer"] p{color:#8aab80!important;}
-.sec{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
- letter-spacing:2px;text-transform:uppercase;color:#8aab80;
- border-left:4px solid #4a9e3f;padding-left:10px;margin:8px 0 12px;}
-.logo-frame{background:linear-gradient(145deg,#0a1628,#0d2040);border:2px solid #c9a227;
+/* Tema teste Lovable + Segoe UI (Apontamento Campo) */
+:root{
+ --sigcf-bg:#0a1409;--sigcf-card:#0f1f12;--sigcf-border:#2a4030;
+ --sigcf-text:#e8edd0;--sigcf-label:#8aab80;--sigcf-green:#6fcf60;
+ --sigcf-gold:#ffd966;--sigcf-ouro:#c9a227;
+ --sigcf-font:'Segoe UI','Segoe UI Variable',system-ui,-apple-system,sans-serif;
+}
+html,body,[class*="css"]{font-family:var(--sigcf-font)!important;}
+[data-testid="stAppViewContainer"]{background:var(--sigcf-bg);}
+[data-testid="stSidebar"]{background:#111c10;border-right:1px solid var(--sigcf-border);}
+[data-testid="stHeader"]{background:var(--sigcf-bg);}
+h1,h2,h3,h4,p,span,label,div{color:var(--sigcf-text);}
+h1,h2,h3,h4{
+ font-family:var(--sigcf-font)!important;font-weight:600;letter-spacing:0.02em;}
+h1{font-size:1.75rem;}
+.stCaption,[data-testid="stCaptionContainer"] p{
+ color:var(--sigcf-label)!important;font-family:var(--sigcf-font)!important;}
+.sec{
+ font-family:var(--sigcf-font)!important;font-size:12px;font-weight:600;
+ letter-spacing:0.12em;text-transform:uppercase;color:var(--sigcf-gold);
+ border-left:4px solid var(--sigcf-green);padding-left:10px;margin:8px 0 12px;}
+.logo-frame{background:linear-gradient(145deg,#0a1628,#0d2040);border:2px solid var(--sigcf-ouro);
  border-radius:12px;padding:5px;display:inline-block;box-shadow:0 4px 18px rgba(0,0,0,.45);}
 .logo-frame img{display:block;border-radius:8px;}
 
 .stTextInput input,.stNumberInput input,.stTextArea textarea,
 [data-testid="stDateInput"] input{
  background:#dce6d2!important;color:#1a2818!important;
- border:1px solid #4a6644!important;border-radius:8px!important;}
+ border:1px solid var(--sigcf-border)!important;border-radius:8px!important;
+ font-family:var(--sigcf-font)!important;}
 .stTextInput input:focus,.stNumberInput input:focus,.stTextArea textarea:focus,
 [data-testid="stDateInput"] input:focus{
- border-color:#6fcf60!important;box-shadow:0 0 0 1px #6fcf6044!important;}
+ border-color:var(--sigcf-green)!important;box-shadow:0 0 0 1px rgba(111,207,96,.35)!important;}
 div[data-baseweb="select"] > div{
- background:#dce6d2!important;border:1px solid #4a6644!important;
- color:#1a2818!important;border-radius:8px!important;}
+ background:#dce6d2!important;border:1px solid var(--sigcf-border)!important;
+ color:#1a2818!important;border-radius:8px!important;
+ font-family:var(--sigcf-font)!important;}
 div[data-baseweb="select"] div{color:#1a2818!important;}
 div[data-baseweb="select"] svg{fill:#4a6644!important;}
 ul[data-testid="stSelectboxVirtualDropdown"],
 div[data-baseweb="popover"] ul{background:#e8edd0!important;}
-div[data-baseweb="popover"] li{color:#1a2818!important;}
+div[data-baseweb="popover"] li{color:#1a2818!important;font-family:var(--sigcf-font)!important;}
 [data-testid="stNumberInput"] button{
- background:#cdd9c4!important;border-color:#4a6644!important;color:#1a2818!important;}
+ background:#cdd9c4!important;border-color:var(--sigcf-border)!important;color:#1a2818!important;}
 [data-testid="stForm"]{
- background:#0d180c!important;border:1px solid #1e2e1c!important;
+ background:var(--sigcf-card)!important;border:1px solid var(--sigcf-border)!important;
  border-radius:12px;padding:12px 16px;}
 [data-testid="stVerticalBlockBorderWrapper"]{
- background:#0d180c!important;border-color:#1e2e1c!important;}
-div[data-testid="stMetric"]{background:#0d180c;border:1px solid #1e2e1c;border-radius:10px;padding:10px 14px;}
-div[data-testid="stMetric"] label{color:#8aab80!important;}
-div[data-testid="stMetricValue"]{color:#6fcf60!important;font-family:'Barlow Condensed',sans-serif;}
+ background:var(--sigcf-card)!important;border-color:var(--sigcf-border)!important;}
+div[data-testid="stMetric"]{
+ background:var(--sigcf-card);border:1px solid var(--sigcf-border);
+ border-left:4px solid var(--sigcf-green);border-radius:8px;padding:12px 16px;}
+div[data-testid="stMetric"] label{
+ color:var(--sigcf-label)!important;font-family:var(--sigcf-font)!important;
+ font-size:11px!important;letter-spacing:0.1em!important;text-transform:uppercase!important;}
+div[data-testid="stMetricValue"]{
+ color:var(--sigcf-gold)!important;font-family:var(--sigcf-font)!important;
+ font-weight:700!important;font-size:1.6rem!important;}
 
-.stTabs [data-baseweb="tab-list"]{background:#0d180c;border-bottom:1px solid #1e2e1c;gap:8px;}
+.stTabs [data-baseweb="tab-list"]{
+ background:var(--sigcf-card);border-bottom:1px solid var(--sigcf-border);gap:8px;}
 .stTabs [data-baseweb="tab"]{
- color:#8aab80!important;font-family:'Barlow Condensed',sans-serif;
- font-weight:600;letter-spacing:0.5px;}
+ color:var(--sigcf-label)!important;font-family:var(--sigcf-font)!important;
+ font-weight:600;letter-spacing:0.12em;text-transform:uppercase;}
 .stTabs [aria-selected="true"]{
- color:#e8edd0!important;border-bottom-color:#4a9e3f!important;}
+ color:var(--sigcf-green)!important;border-bottom:3px solid var(--sigcf-green)!important;}
 [data-testid="stExpander"]{
- background:#0d180c!important;border:1px solid #1e2e1c!important;border-radius:10px;}
-[data-testid="stExpander"] summary{color:#e8edd0!important;}
-.stTabs [data-baseweb="tab-highlight"]{background-color:#4a9e3f!important;}
+ background:var(--sigcf-card)!important;border:1px solid var(--sigcf-border)!important;border-radius:10px;}
+[data-testid="stExpander"] summary{
+ color:var(--sigcf-text)!important;font-family:var(--sigcf-font)!important;}
+.stTabs [data-baseweb="tab-highlight"]{background-color:var(--sigcf-green)!important;}
 .stButton button,[data-testid="stFormSubmitButton"] button{
- background:#4a9e3f!important;color:#ffffff!important;border:1px solid #6fcf60!important;
- font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:1.5px;
+ background:#4a9e3f!important;color:#ffffff!important;border:1px solid var(--sigcf-green)!important;
+ font-family:var(--sigcf-font)!important;font-weight:600;letter-spacing:0.08em;
  text-transform:uppercase;border-radius:8px;}
 .stButton button:hover,[data-testid="stFormSubmitButton"] button:hover{background:#3d8534!important;}
 .stButton button p,[data-testid="stFormSubmitButton"] button p{color:#ffffff!important;}
@@ -97,7 +118,7 @@ def dark_table(df, height=260):
         f'<div style="overflow-x:auto;border:1px solid #1e2e1c;border-radius:10px;">'
         f'<div style="max-height:{height}px;overflow-y:auto;">'
         f'<table style="width:100%;border-collapse:collapse;background:#0d180c;'
-        f'font-family:Barlow Condensed,sans-serif;"><thead><tr>{headers}</tr></thead>'
+        f'font-family:Segoe UI,sans-serif;"><thead><tr>{headers}</tr></thead>'
         f'<tbody>{rows}</tbody></table></div></div>',
         unsafe_allow_html=True,
     )
@@ -529,7 +550,7 @@ def rodape_ultimos_lancamentos():
 
 
 OPERACOES = [
-    "GRADAGEM", "PLANTIO", "CORTE DE EUCALIPTO", "PULVERIZACAO",
+    "GRADAGEM", "PLANTIO", "CORTE DE EUCALIPTO", "PULVERIZACAO", "TERRAPLANAGEM",
     "ROCAGEM", "SUBSOLAGEM", "CALAGEM", "ADUBACAO", "IRRIGACAO",
     "MANUTENCAO DE ESTRADA", "LIMPEZA DE RANK", "MARCACAO DE PASTORIL", "CONCEICAO",
     "CAPINA QUIMICA", "LAMININHA", "COLETA DE RESIDUOS", "CARRETA DO SAL",
@@ -538,8 +559,7 @@ OPERACOES = [
     "TRATO", "CARREGAR CALCARIO", "TERRAPLANAGEM RURAL", "COMBATE INCENDIO",
     "CONTROLE DE FORMIGA", "ACEIRO DE FLORESTA", "CARREADOR DE FLORESTA",
     "HERCULES", "PUXAR LINK", "FENO", "LIMPEZA DE BAIA", "ESPLANADA",
-    "SERVICOS DIVERSOS", "LIMPEZA DE COCHO", "OUTRA", "ESTRODANDO TERRA", "REPLANTIO",
-    "ATERRO DE MANGA", "ADVANCE", "DESSECA", "JUMIL", "LIMPEZA DE CARREADOR",
+    "SERVICOS DIVERSOS", "LIMPEZA DE COCHO", "OUTRA",
 ]
 OPERACOES_FORM = ["— Selecione —"] + OPERACOES
 

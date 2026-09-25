@@ -48,13 +48,13 @@ def exigir_acesso(titulo: str, subtitulo: str = "Acesso restrito — SIGCF Santa
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&display=swap');
         .stApp{
          background:linear-gradient(rgba(10,20,9,0.82),rgba(10,20,9,0.92)),
          url('__BG__') center center/cover no-repeat fixed!important;}
         [data-testid="stAppViewContainer"]{background:transparent!important;}
-        h1,h2,p,label{color:#e8edd0;}
-        h1{font-family:'Barlow Condensed',sans-serif;}
+        h1,h2,p,label{color:#e8edd0;
+         font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;}
+        h1{font-weight:600;letter-spacing:0.02em;}
         __LOGO_CSS__
         .insta-link{display:inline-flex;align-items:center;gap:6px;color:#8ec486!important;
          text-decoration:none;font-weight:600;}
