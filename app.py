@@ -18,7 +18,7 @@ exigir_acesso("Apontamento de Campo")
 
 st.markdown("""
 <style>
-/* Tema teste Lovable + Segoe UI (Apontamento Campo) */
+/* Tema teste Lovable + Segoe UI — v2 (cores visíveis + maiúsculas) */
 :root{
  --sigcf-bg:#0a1409;--sigcf-card:#0f1f12;--sigcf-border:#2a4030;
  --sigcf-text:#e8edd0;--sigcf-label:#8aab80;--sigcf-green:#6fcf60;
@@ -29,72 +29,112 @@ html,body,[class*="css"]{font-family:var(--sigcf-font)!important;}
 [data-testid="stAppViewContainer"]{background:var(--sigcf-bg);}
 [data-testid="stSidebar"]{background:#111c10;border-right:1px solid var(--sigcf-border);}
 [data-testid="stHeader"]{background:var(--sigcf-bg);}
-h1,h2,h3,h4,p,span,label,div{color:var(--sigcf-text);}
+h1,h2,h3,h4,p,span,label{color:var(--sigcf-text);}
 h1,h2,h3,h4{
- font-family:var(--sigcf-font)!important;font-weight:600;letter-spacing:0.02em;}
-h1{font-size:1.75rem;}
+ font-family:var(--sigcf-font)!important;font-weight:700;
+ letter-spacing:0.08em;text-transform:uppercase;}
 .stCaption,[data-testid="stCaptionContainer"] p{
- color:var(--sigcf-label)!important;font-family:var(--sigcf-font)!important;}
+ color:var(--sigcf-ouro)!important;font-family:var(--sigcf-font)!important;
+ letter-spacing:0.1em;text-transform:uppercase!important;font-size:12px!important;}
+
+/* Cabeçalho customizado */
+.sigcf-kicker{
+ font-size:11px;color:var(--sigcf-label);letter-spacing:0.16em;
+ text-transform:uppercase;margin:0 0 6px;font-weight:600;}
+.sigcf-title{
+ font-size:1.9rem;color:var(--sigcf-gold)!important;font-weight:700;
+ letter-spacing:0.1em;text-transform:uppercase;margin:0;line-height:1.1;}
+.sigcf-sub{
+ font-size:12px;color:var(--sigcf-ouro)!important;letter-spacing:0.12em;
+ text-transform:uppercase;margin:6px 0 0;font-weight:600;}
+
 .sec{
- font-family:var(--sigcf-font)!important;font-size:12px;font-weight:600;
- letter-spacing:0.12em;text-transform:uppercase;color:var(--sigcf-gold);
+ font-family:var(--sigcf-font)!important;font-size:12px;font-weight:700;
+ letter-spacing:0.14em;text-transform:uppercase;color:var(--sigcf-gold);
  border-left:4px solid var(--sigcf-green);padding-left:10px;margin:8px 0 12px;}
 .logo-frame{background:linear-gradient(145deg,#0a1628,#0d2040);border:2px solid var(--sigcf-ouro);
  border-radius:12px;padding:5px;display:inline-block;box-shadow:0 4px 18px rgba(0,0,0,.45);}
 .logo-frame img{display:block;border-radius:8px;}
 
+/* Labels de campos — maiúsculas + ouro */
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] label,
+[data-testid="stWidgetLabel"] span,
+.stTextInput label p,.stNumberInput label p,.stSelectbox label p,
+.stDateInput label p,.stTextArea label p{
+ color:var(--sigcf-gold)!important;font-family:var(--sigcf-font)!important;
+ font-size:11px!important;font-weight:600!important;
+ letter-spacing:0.1em!important;text-transform:uppercase!important;}
+
+/* Subtítulos de bloco (Identificação do turno, etc.) */
+.stMarkdown p strong,
+[data-testid="stMarkdownContainer"] p strong{
+ color:var(--sigcf-gold)!important;font-family:var(--sigcf-font)!important;
+ font-weight:700!important;letter-spacing:0.12em!important;
+ text-transform:uppercase!important;font-size:13px!important;}
+
 .stTextInput input,.stNumberInput input,.stTextArea textarea,
 [data-testid="stDateInput"] input{
  background:#dce6d2!important;color:#1a2818!important;
- border:1px solid var(--sigcf-border)!important;border-radius:8px!important;
+ border:1px solid var(--sigcf-ouro)!important;border-radius:8px!important;
  font-family:var(--sigcf-font)!important;}
 .stTextInput input:focus,.stNumberInput input:focus,.stTextArea textarea:focus,
 [data-testid="stDateInput"] input:focus{
- border-color:var(--sigcf-green)!important;box-shadow:0 0 0 1px rgba(111,207,96,.35)!important;}
+ border-color:var(--sigcf-green)!important;box-shadow:0 0 0 2px rgba(111,207,96,.45)!important;}
 div[data-baseweb="select"] > div{
- background:#dce6d2!important;border:1px solid var(--sigcf-border)!important;
+ background:#dce6d2!important;border:1px solid var(--sigcf-ouro)!important;
  color:#1a2818!important;border-radius:8px!important;
  font-family:var(--sigcf-font)!important;}
 div[data-baseweb="select"] div{color:#1a2818!important;}
-div[data-baseweb="select"] svg{fill:#4a6644!important;}
+div[data-baseweb="select"] svg{fill:var(--sigcf-ouro)!important;}
 ul[data-testid="stSelectboxVirtualDropdown"],
 div[data-baseweb="popover"] ul{background:#e8edd0!important;}
 div[data-baseweb="popover"] li{color:#1a2818!important;font-family:var(--sigcf-font)!important;}
 [data-testid="stNumberInput"] button{
- background:#cdd9c4!important;border-color:var(--sigcf-border)!important;color:#1a2818!important;}
+ background:#cdd9c4!important;border-color:var(--sigcf-ouro)!important;color:#1a2818!important;}
 [data-testid="stForm"]{
- background:var(--sigcf-card)!important;border:1px solid var(--sigcf-border)!important;
+ background:var(--sigcf-card)!important;border:1px solid var(--sigcf-ouro)!important;
  border-radius:12px;padding:12px 16px;}
 [data-testid="stVerticalBlockBorderWrapper"]{
- background:var(--sigcf-card)!important;border-color:var(--sigcf-border)!important;}
+ background:var(--sigcf-card)!important;border-color:var(--sigcf-ouro)!important;}
 div[data-testid="stMetric"]{
- background:var(--sigcf-card);border:1px solid var(--sigcf-border);
+ background:var(--sigcf-card);border:1px solid var(--sigcf-green);
  border-left:4px solid var(--sigcf-green);border-radius:8px;padding:12px 16px;}
 div[data-testid="stMetric"] label{
  color:var(--sigcf-label)!important;font-family:var(--sigcf-font)!important;
- font-size:11px!important;letter-spacing:0.1em!important;text-transform:uppercase!important;}
+ font-size:11px!important;letter-spacing:0.12em!important;text-transform:uppercase!important;}
 div[data-testid="stMetricValue"]{
  color:var(--sigcf-gold)!important;font-family:var(--sigcf-font)!important;
  font-weight:700!important;font-size:1.6rem!important;}
 
 .stTabs [data-baseweb="tab-list"]{
- background:var(--sigcf-card);border-bottom:1px solid var(--sigcf-border);gap:8px;}
+ background:linear-gradient(180deg,#0a1628 0%,var(--sigcf-card) 100%);
+ border-bottom:2px solid var(--sigcf-green);gap:8px;padding-top:4px;}
 .stTabs [data-baseweb="tab"]{
  color:var(--sigcf-label)!important;font-family:var(--sigcf-font)!important;
- font-weight:600;letter-spacing:0.12em;text-transform:uppercase;}
-.stTabs [aria-selected="true"]{
- color:var(--sigcf-green)!important;border-bottom:3px solid var(--sigcf-green)!important;}
+ font-weight:700;letter-spacing:0.1em;text-transform:uppercase;}
+.stTabs [data-baseweb="tab"]:hover{color:var(--sigcf-gold)!important;}
+.stTabs button[data-baseweb="tab"][aria-selected="true"],
+.stTabs [data-baseweb="tab"][aria-selected="true"]{
+ color:var(--sigcf-gold)!important;}
+.stTabs [data-baseweb="tab-highlight"]{
+ background-color:var(--sigcf-green)!important;height:3px!important;}
+.stTabs [data-baseweb="tab-border"]{background-color:var(--sigcf-border)!important;}
 [data-testid="stExpander"]{
- background:var(--sigcf-card)!important;border:1px solid var(--sigcf-border)!important;border-radius:10px;}
+ background:var(--sigcf-card)!important;border:1px solid var(--sigcf-ouro)!important;border-radius:10px;}
 [data-testid="stExpander"] summary{
- color:var(--sigcf-text)!important;font-family:var(--sigcf-font)!important;}
-.stTabs [data-baseweb="tab-highlight"]{background-color:var(--sigcf-green)!important;}
+ color:var(--sigcf-gold)!important;font-family:var(--sigcf-font)!important;
+ text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
 .stButton button,[data-testid="stFormSubmitButton"] button{
- background:#4a9e3f!important;color:#ffffff!important;border:1px solid var(--sigcf-green)!important;
- font-family:var(--sigcf-font)!important;font-weight:600;letter-spacing:0.08em;
+ background:linear-gradient(180deg,#4a9e3f,#3d8534)!important;color:#fff!important;
+ border:1px solid var(--sigcf-gold)!important;
+ font-family:var(--sigcf-font)!important;font-weight:700;letter-spacing:0.1em;
  text-transform:uppercase;border-radius:8px;}
-.stButton button:hover,[data-testid="stFormSubmitButton"] button:hover{background:#3d8534!important;}
+.stButton button:hover,[data-testid="stFormSubmitButton"] button:hover{
+ background:linear-gradient(180deg,#3d8534,#2f6a28)!important;
+ border-color:var(--sigcf-green)!important;}
 .stButton button p,[data-testid="stFormSubmitButton"] button p{color:#ffffff!important;}
+hr{border-color:var(--sigcf-border)!important;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -110,7 +150,7 @@ def dark_table(df, height=260):
             for v in row) + "</tr>"
         for _, row in df.iterrows())
     headers = "".join(
-        f'<th style="padding:7px 10px;background:#111c10;color:#8aab80;font-size:10px;'
+        f'<th style="padding:7px 10px;background:#1a2818;color:#ffd966;font-size:10px;'
         f'font-weight:700;text-transform:uppercase;letter-spacing:1px;'
         f'border-bottom:2px solid #1e2e1c;white-space:nowrap;">{c}</th>'
         for c in df.columns)
@@ -572,8 +612,12 @@ col_logo, col_titulo = st.columns([1.1, 5.9])
 with col_logo:
     st.markdown(logo_html(118), unsafe_allow_html=True)
 with col_titulo:
-    st.title("Apontamento de Campo")
-    st.caption("SIGCF — Sistema Integrado de Gestão de Custos de Frota")
+    st.markdown(
+        '<div class="sigcf-kicker">Santa Virgínia Agropecuária e Florestal LTDA</div>'
+        '<h1 class="sigcf-title">Apontamento de Campo</h1>'
+        '<p class="sigcf-sub">SIGCF — Sistema Integrado de Gestão de Custos de Frota</p>',
+        unsafe_allow_html=True,
+    )
 
 pagina = st.tabs(["📝 Novo Apontamento", "📋 Consultar", "📊 Resumo por Frota"])
 
