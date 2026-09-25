@@ -18,7 +18,7 @@ exigir_acesso("Apontamento de Campo")
 
 st.markdown("""
 <style>
-/* Tema SIGCF — v4 polimento (Lovable + Segoe UI) */
+/* Tema SIGCF — v5 refinamento 9/10 (Lovable + Segoe UI) */
 :root{
  --sigcf-bg:#0a1409;--sigcf-card:#0f1f12;--sigcf-border:#2a4030;
  --sigcf-text:#e8edd0;--sigcf-label:#8aab80;--sigcf-green:#6fcf60;
@@ -42,7 +42,7 @@ h1,h2,h3,h4{
 .sigcf-header-band{
  background:linear-gradient(145deg,var(--sigcf-navy-a) 0%,var(--sigcf-navy-b) 100%);
  border:1px solid rgba(201,162,39,.35);border-bottom:2px solid var(--sigcf-green);
- border-radius:12px;padding:14px 18px;margin:0 0 20px;
+ border-radius:12px;padding:16px 20px;margin:0 0 24px;
  box-shadow:0 6px 24px rgba(0,0,0,.35);}
 .sigcf-header-inner{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
 .sigcf-header-text{flex:1;min-width:220px;}
@@ -139,24 +139,69 @@ div[data-testid="stMetricValue"]{
 .stTabs button[data-baseweb="tab"] p,
 .stTabs [data-baseweb="tab"] p{color:inherit!important;font-size:12px!important;
  letter-spacing:0.12em!important;text-transform:uppercase!important;}
-[data-testid="stTabs"]{margin-top:4px;margin-bottom:12px;}
+[data-testid="stTabs"]{margin-top:8px;margin-bottom:14px;}
 [data-testid="stExpander"]{
  background:var(--sigcf-card)!important;border:1px solid var(--sigcf-border)!important;border-radius:10px;}
 [data-testid="stExpander"] summary{
  color:var(--sigcf-gold)!important;font-family:var(--sigcf-font)!important;
  text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
-.stButton button,[data-testid="stFormSubmitButton"] button{
- background:linear-gradient(180deg,#4a9e3f,#3d8534)!important;color:#fff!important;
- border:1px solid rgba(201,162,39,.55)!important;
+.stButton button,[data-testid="stFormSubmitButton"] button,[data-testid="stDownloadButton"] button,
+.stTextInput input,.stNumberInput input,[data-testid="stDateInput"] input,
+div[data-baseweb="select"] > div{
+ transition:border-color .18s ease,background .18s ease,box-shadow .18s ease,color .18s ease;}
+/* Botões secundários — contorno verde */
+.main .stButton > button{
+ background:rgba(15,31,18,.88)!important;color:var(--sigcf-text)!important;
+ border:1px solid var(--sigcf-green)!important;
  font-family:var(--sigcf-font)!important;font-weight:700;letter-spacing:0.12em;
- text-transform:uppercase;border-radius:8px;font-size:0.78rem!important;
+ text-transform:uppercase;border-radius:8px;font-size:0.76rem!important;
  padding:0.45rem 0.85rem!important;min-height:2.25rem!important;}
-.stButton button:hover,[data-testid="stFormSubmitButton"] button:hover{
- background:linear-gradient(180deg,#3d8534,#2f6a28)!important;
- border-color:var(--sigcf-green)!important;}
-.stButton button p,[data-testid="stFormSubmitButton"] button p{
- color:#ffffff!important;font-size:0.78rem!important;letter-spacing:0.12em!important;}
-hr{border-color:var(--sigcf-border)!important;}
+.main .stButton > button:hover{
+ background:rgba(111,207,96,.14)!important;border-color:var(--sigcf-ouro)!important;}
+.main .stButton > button p{color:var(--sigcf-text)!important;
+ font-size:0.76rem!important;letter-spacing:0.12em!important;}
+/* Botões principais — verde + borda ouro */
+[data-testid="stFormSubmitButton"] button,[data-testid="stDownloadButton"] button{
+ background:linear-gradient(180deg,#5aad4f,#4a9e3f)!important;color:#fff!important;
+ border:2px solid var(--sigcf-ouro)!important;
+ font-family:var(--sigcf-font)!important;font-weight:700;letter-spacing:0.12em;
+ text-transform:uppercase;border-radius:8px;font-size:0.82rem!important;
+ padding:0.55rem 1rem!important;min-height:2.5rem!important;
+ box-shadow:0 2px 14px rgba(0,0,0,.28)!important;}
+[data-testid="stFormSubmitButton"] button:hover,[data-testid="stDownloadButton"] button:hover{
+ background:linear-gradient(180deg,#4a9e3f,#3d8534)!important;
+ border-color:var(--sigcf-gold)!important;
+ box-shadow:0 4px 18px rgba(111,207,96,.18)!important;}
+[data-testid="stFormSubmitButton"] button p,[data-testid="stDownloadButton"] button p{
+ color:#ffffff!important;font-size:0.82rem!important;letter-spacing:0.12em!important;}
+hr,.sigcf-op-sep{
+ border:none!important;height:1px!important;margin:20px 0!important;
+ background:linear-gradient(90deg,transparent,var(--sigcf-border) 20%,var(--sigcf-green) 50%,var(--sigcf-border) 80%,transparent)!important;}
+.sigcf-op-sep{display:block;width:100%;}
+.sigcf-footer{
+ text-align:center;color:var(--sigcf-label)!important;font-size:10px!important;
+ letter-spacing:0.16em;text-transform:uppercase;padding:18px 0 6px;
+ border-top:1px solid var(--sigcf-border);margin-top:28px;}
+[data-testid="stAlert"]{
+ border-radius:10px!important;font-family:var(--sigcf-font)!important;
+ background:var(--sigcf-card)!important;border:1px solid var(--sigcf-border)!important;}
+[data-testid="stAlert"] p,[data-testid="stAlert"] span{color:var(--sigcf-text)!important;
+ font-size:12px!important;letter-spacing:0.04em;}
+[data-testid="stAlert"]:has([data-testid="stAlertContentInfo"]),
+.stAlert[data-baseweb="notification"]{
+ border-color:var(--sigcf-green)!important;
+ background:rgba(15,31,18,.95)!important;}
+[data-testid="stMetric"]{transition:box-shadow .18s ease;}
+div[data-testid="stMetric"]:hover{box-shadow:0 0 0 1px rgba(111,207,96,.35);}
+.main .block-container{padding-top:1rem;padding-bottom:2.5rem;max-width:1180px;}
+.sigcf-table-wrap{border:1px solid var(--sigcf-border)!important;border-radius:10px;}
+.sigcf-table-wrap::-webkit-scrollbar{height:6px;width:6px;}
+.sigcf-table-wrap::-webkit-scrollbar-thumb{background:var(--sigcf-green);border-radius:4px;}
+.sigcf-table-wrap::-webkit-scrollbar-track{background:var(--sigcf-card);}
+#MainMenu{visibility:hidden;}
+footer{visibility:hidden;}
+[data-testid="stToolbar"]{visibility:hidden;}
+[data-testid="stDecoration"]{display:none;}
 
 /* Força verde na aba ativa — anula vermelho padrão Streamlit */
 .stTabs [data-baseweb="tab-highlight"],
@@ -174,19 +219,19 @@ def dark_table(df, height=260):
         return
     rows = "".join(
         "<tr>" + "".join(
-            f'<td style="padding:6px 10px;border-bottom:1px solid #1e2e1c;'
+            f'<td style="padding:6px 10px;border-bottom:1px solid #2a4030;'
             f'color:#e8edd0;font-size:12px;white-space:nowrap;">{v}</td>'
             for v in row) + "</tr>"
         for _, row in df.iterrows())
     headers = "".join(
         f'<th style="padding:7px 10px;background:#1a2818;color:#ffd966;font-size:10px;'
         f'font-weight:700;text-transform:uppercase;letter-spacing:1px;'
-        f'border-bottom:2px solid #1e2e1c;white-space:nowrap;">{c}</th>'
+        f'border-bottom:2px solid #2a4030;white-space:nowrap;">{c}</th>'
         for c in df.columns)
     st.markdown(
-        f'<div style="overflow-x:auto;border:1px solid #1e2e1c;border-radius:10px;">'
+        f'<div class="sigcf-table-wrap" style="overflow-x:auto;">'
         f'<div style="max-height:{height}px;overflow-y:auto;">'
-        f'<table style="width:100%;border-collapse:collapse;background:#0d180c;'
+        f'<table style="width:100%;border-collapse:collapse;background:#0f1f12;'
         f'font-family:Segoe UI,sans-serif;"><thead><tr>{headers}</tr></thead>'
         f'<tbody>{rows}</tbody></table></div></div>',
         unsafe_allow_html=True,
@@ -615,7 +660,10 @@ def rodape_ultimos_lancamentos():
     st.divider()
     st.markdown('<div class="sec">Últimos lançamentos</div>', unsafe_allow_html=True)
     dark_table(ultimos_lancamentos_df(), height=200)
-    st.caption("SIGCF | Apontamento de Campo | Núcleo de Controladoria SV")
+    st.markdown(
+        '<div class="sigcf-footer">SIGCF | Apontamento de Campo | Núcleo de Controladoria SV</div>',
+        unsafe_allow_html=True,
+    )
 
 
 OPERACOES = [
@@ -662,44 +710,44 @@ with pagina[0]:
 
     b1, b2, b3 = st.columns([1.2, 1.2, 4])
     with b1:
-        if st.button("➕ Adicionar operação", key="btn_add_op"):
+        if st.button("Adicionar operação", key="btn_add_op"):
             if st.session_state.num_operacoes < MAX_OPERACOES:
                 st.session_state.num_operacoes += 1
                 st.rerun()
     with b2:
-        if st.button("➖ Remover operação", key="btn_rem_op"):
+        if st.button("Remover operação", key="btn_rem_op"):
             if st.session_state.num_operacoes > 1:
                 st.session_state.num_operacoes -= 1
                 st.rerun()
     with b3:
         st.caption(
             f"**{st.session_state.num_operacoes}** operação(ões) neste turno — "
-            "use ➕ para casos como Josivaldo (548 + 550 no mesmo dia)."
+            "use Adicionar operação para casos como Josivaldo (548 + 550 no mesmo dia)."
         )
 
     with st.form("form_apontamento", clear_on_submit=True):
         st.markdown("**Identificação do turno**")
         col1, col2, col3 = st.columns(3)
         with col1:
-            data_ap = st.date_input("📅 Data", value=date.today())
+            data_ap = st.date_input("Data", value=date.today())
         with col2:
-            frota = st.text_input("🚜 Frota (ID)", placeholder="Ex: 3396")
+            frota = st.text_input("Frota (ID)", placeholder="Ex: 3396")
         with col3:
             operador = st.selectbox(
-                "👤 Operador",
+                "Operador",
                 options=colaboradores if colaboradores else ["Sem operadores cadastrados"],
             )
 
         st.markdown("**Horários do turno**")
         t1, t2, t3, t4 = st.columns(4)
         with t1:
-            inicio_turno = st.text_input("▶ Início turno", placeholder="06:36")
+            inicio_turno = st.text_input("Início turno", placeholder="06:36")
         with t2:
-            fim_turno = st.text_input("⏹ Fim turno", placeholder="18:23")
+            fim_turno = st.text_input("Fim turno", placeholder="18:23")
         with t3:
-            almoco = st.text_input("🍽 Almoço (saída)", placeholder="11:42")
+            almoco = st.text_input("Almoço (saída)", placeholder="11:42")
         with t4:
-            retorno = st.text_input("↩ Retorno", placeholder="13:00")
+            retorno = st.text_input("Retorno", placeholder="13:00")
 
         st.markdown("**Horímetro do turno**")
         h1, h2, h3 = st.columns(3)
@@ -720,23 +768,23 @@ with pagina[0]:
 
         operacoes_form = []
         for idx in range(st.session_state.num_operacoes):
-            st.markdown(f"---")
+            st.markdown('<div class="sigcf-op-sep"></div>', unsafe_allow_html=True)
             st.markdown(f"**Operação {idx + 1}**")
             c_op1, c_op2 = st.columns(2)
             with c_op1:
                 succao = st.selectbox(
-                    "⚙️ Operação",
+                    "Operação",
                     options=OPERACOES_FORM,
                     key=f"op_{idx}_succao",
                 )
             with c_op2:
                 talhoes = st.text_input(
-                    "🌾 Talhão / área",
+                    "Talhão / área",
                     placeholder="Ex: pasto 548 (deixe vazio se não houver)",
                     key=f"op_{idx}_talhoes",
                 )
             local = st.text_input(
-                "📍 Local / retiro (opcional)",
+                "Local / retiro (opcional)",
                 placeholder="Ex: Córrego do Campo",
                 key=f"op_{idx}_local",
             )
@@ -744,11 +792,11 @@ with pagina[0]:
             o1, o2, o3, o4 = st.columns(4)
             with o1:
                 inicio_operacao = st.text_input(
-                    "▶ Início operação", placeholder="08:00", key=f"op_{idx}_ini_op"
+                    "Início operação", placeholder="08:00", key=f"op_{idx}_ini_op"
                 )
             with o2:
                 fim_operacao = st.text_input(
-                    "⏹ Fim operação", placeholder="10:43", key=f"op_{idx}_fim_op"
+                    "Fim operação", placeholder="10:43", key=f"op_{idx}_fim_op"
                 )
             with o3:
                 h_ini_op = st.number_input(
@@ -768,7 +816,7 @@ with pagina[0]:
                 )
 
             with st.expander(
-                f"🧪 Insumos — operação {idx + 1} (opcional)",
+                f"Insumos — operação {idx + 1} (opcional)",
                 expanded=False,
             ):
                 st.caption(
@@ -817,9 +865,9 @@ with pagina[0]:
                 "insumos_extras": insumos_extras,
             })
 
-        obs = st.text_area("📝 Observação geral")
+        obs = st.text_area("Observação geral")
         submitted = st.form_submit_button(
-            "✅ Registrar Apontamento", use_container_width=True, type="primary"
+            "Registrar apontamento", use_container_width=True, type="primary"
         )
 
     if submitted:
@@ -871,7 +919,7 @@ with pagina[0]:
 
         if erros:
             for e in erros:
-                st.error(f"⚠️ {e}")
+                st.error(str(e))
         else:
             resumo = montar_resumo_pai(operacoes)
             novo = {
@@ -920,12 +968,11 @@ with pagina[0]:
                     msg_extra = f" | fato_operacoes: {', '.join(detalhes_fato)}"
 
                 st.success(
-                    f"✅ Apontamento #{id_apontamento} salvo! "
+                    f"Apontamento #{id_apontamento} salvo. "
                     f"{frota.upper()} | {operador} | {horas:.1f}h | "
                     f"{len(ops_ativas)} op(s){msg_extra}"
                 )
                 st.session_state.num_operacoes = 1
-                st.balloons()
                 st.cache_data.clear()
                 st.rerun()
             except Exception as e:
@@ -937,7 +984,7 @@ with pagina[0]:
 with pagina[1]:
     st.markdown('<div class="sec">Consultar apontamentos</div>', unsafe_allow_html=True)
 
-    with st.expander("🔍 Filtros", expanded=True):
+    with st.expander("Filtros", expanded=True):
         fc1, fc2, fc3, fc4 = st.columns(4)
         with fc1:
             f_ini = st.date_input("Data início", value=None, key="ci")
@@ -970,7 +1017,7 @@ with pagina[1]:
         dark_table(df_show.head(50), height=360)
 
         st.download_button(
-            "⬇️ Exportar Excel",
+            "Exportar Excel",
             data=gerar_excel(df_show),
             file_name=f"apontamento_{date.today()}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -982,7 +1029,7 @@ with pagina[1]:
 with pagina[2]:
     st.markdown('<div class="sec">Resumo por frota</div>', unsafe_allow_html=True)
 
-    with st.expander("🔍 Período", expanded=True):
+    with st.expander("Período", expanded=True):
         r1, r2 = st.columns(2)
         with r1:
             r_ini = st.date_input("Data início", value=None, key="ri")
