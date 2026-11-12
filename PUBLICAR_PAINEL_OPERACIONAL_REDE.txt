@@ -1,0 +1,58 @@
+═══════════════════════════════════════════════════════════════
+ PAINEL OPERACIONAL — VER DE QUALQUER LUGAR (igual os outros SIGCF)
+═══════════════════════════════════════════════════════════════
+
+localhost (8513) só funciona no SEU PC. Para gerência, celular e outra sala:
+use STREAMLIT CLOUD (mesmo esquema do apontamento_campo).
+
+───────────────────────────────────────────────────────────────
+ STREAMLIT CLOUD (recomendado — link HTTPS, funciona no celular)
+───────────────────────────────────────────────────────────────
+
+1) GitHub: repositório lubrificacaomaquinassv-cloud/apontamento_campo
+   (ou um repo só “painel-campo-operacional”)
+
+2) Subir estes arquivos da pasta ATUALIZACAO_APONTAMENTO_CAMPO:
+   · painel_operacional.py          ← Main file no Streamlit Cloud
+   · pwa_medidas.py
+   · sigcf_auth.py
+   · sigcf_theme.py
+   · requirements.txt
+   · pasta assets/ (logo)
+   · pasta .streamlit/config.toml
+
+3) https://share.streamlit.io → New app
+   · Repo + branch
+   · Main file path: painel_operacional.py
+   · Secrets: copiar SUPABASE_URL e SUPABASE_KEY do app antigo
+   · APP_PIN vazio ou o PIN da controladoria
+
+4) URL gerada (exemplo):
+   https://painel-campo-xxxx.streamlit.app
+   Essa URL abre em qualquer rede, PC, tablet ou celular.
+
+───────────────────────────────────────────────────────────────
+ LOVABLE (alternativa — app “nativo” mobile)
+───────────────────────────────────────────────────────────────
+
+Sim, a Lovable consegue o mesmo mobilidade: ela lê o Supabase via API.
+
+Views prontas para o Lovable montar telas:
+  · vw_api_campo_frota_dia
+  · vw_api_campo_turno_medidas
+  · vw_api_custo_hora_pwa
+  · vw_api_campo_turno_custo
+
+O painel Streamlit já está pronto hoje; o Lovable seria uma UI
+paralela (mais cara de montar, mais flexível no celular).
+
+───────────────────────────────────────────────────────────────
+ REDE LOCAL (reunião na fazenda, sem publicar na internet)
+───────────────────────────────────────────────────────────────
+
+python -m streamlit run painel_operacional.py --server.port 8513 --server.address 0.0.0.0
+
+No outro notebook (mesmo Wi‑Fi): http://SEU_IP:8513
+(ipconfig → IPv4). Só funciona com o PC ligado e o Streamlit aberto.
+
+═══════════════════════════════════════════════════════════════

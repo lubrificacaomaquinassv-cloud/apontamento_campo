@@ -1,0 +1,21 @@
+PAINEL OPERACIONAL — publicar no Streamlit Cloud
+================================================
+
+1) GitHub — subir TODOS os arquivos desta pasta para:
+   https://github.com/lubrificacaomaquinassv-cloud/apontamento_campo
+   (pode conviver com app.py do apontamento antigo)
+
+2) Streamlit Cloud — https://share.streamlit.io
+   · New app
+   · Repository: lubrificacaomaquinassv-cloud/apontamento_campo
+   · Main file: painel_operacional.py
+   · Advanced: Python 3.11
+   · Secrets (Settings → Secrets), mesmo do app apontamento:
+       SUPABASE_URL = "https://....supabase.co"
+       SUPABASE_KEY = "eyJ..."
+       APP_PIN = ""    (vazio ou PIN da controladoria)
+
+3) Deploy → copie o link https://....streamlit.app
+   Abre em qualquer rede e no celular.
+
+Não suba secrets.toml nem github_token.txt.

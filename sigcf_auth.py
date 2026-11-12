@@ -53,7 +53,7 @@ def exigir_acesso(titulo: str, subtitulo: str = "Acesso restrito — SIGCF Santa
          url('__BG__') center center/cover no-repeat fixed!important;}
         [data-testid="stAppViewContainer"]{background:transparent!important;}
         h1,h2,p,label{color:#e8edd0;
-         font-family:'Segoe UI','Segoe UI Variable',system-ui,sans-serif;}
+         font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;}
         h1{font-weight:600;letter-spacing:0.02em;}
         __LOGO_CSS__
         .insta-link{display:inline-flex;align-items:center;gap:6px;color:#8ec486!important;

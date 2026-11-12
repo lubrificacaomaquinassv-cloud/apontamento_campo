@@ -1,0 +1,40 @@
+PAINEL CAMPO — VIEWS E API (PostgREST / Supabase)
+==================================================
+
+Aplicar views (uma vez ou após alteração):
+  APLICAR_VIEWS_PAINEL_CAMPO.bat
+
+Salários operadores (planilha Controladoria):
+  D:\RH\Controladoria_10_Máquinas.xls
+  SINCRONIZAR_SALARIOS_MAQUINAS.bat
+  (competência padrão = mês corrente)
+
+Diagnóstico sem gravar:
+  python scripts\diagnostico_salarios_controladoria.py
+
+--- MEDIDAS PWA (painel operacional) ---
+
+vw_api_campo_turno_medidas   → 1 linha por turno
+vw_api_campo_abast_dia_frota → diesel comboio_v2 + posto por dia/frota
+vw_api_campo_frota_dia       → agregado frota×dia (painel principal)
+vw_api_campo_periodo_kpi     → KPI global (filtrar data na query)
+
+Exemplo API:
+  GET .../vw_api_campo_frota_dia?data=gte.2026-10-27&data=lte.2026-11-12
+
+--- SALÁRIO / CUSTO HORA ---
+
+rh_folha_mensal estava em 2026-09 (defasada).
+Fonte atual: rh_salario_maquinas_snapshot + dim_colaborador.
+
+vw_api_salario_operador_maquinas  → último salário da planilha
+vw_api_custo_hora_pwa             → custo/hora por operador do PWA
+vw_api_campo_turno_custo        → turno + custo mão de obra (futuro)
+
+Mecânicos: tabela reservada tipo MECANICO em rh_salario_maquinas_snapshot
+(quando houver Salarios_Oficina.xls + OS na oficina).
+
+--- PAINEL LOCAL ---
+
+RODAR_PAINEL_OPERACIONAL.bat  → porta 8513
+Lê as views quando existirem (fonte: api no rodapé).
